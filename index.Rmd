@@ -61,7 +61,7 @@ base2
 ```
 
 ### Improving an inferential plot
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, results='hide'}
 safe4=read.xlsx(link3)
 
 model1=lm(PERSONAL~HEALTH+INFRASTRUCTURE,data=safe4[,-1])
@@ -104,7 +104,7 @@ p1= base + geom_ribbon(aes(ymin = lower, ymax = upper),
 p2 = p1 + geom_line(aes(y = yvals)) 
 
 p3= p2 + labs(title='Marginal Effects of Digital Security Index on Personal Security Index',
-              subtitle="Digital security index values below 50 do not have large effect on personal security index",
+              subtitle="Digital security index values below 50 not associated with high personal security index",
               x= "Digital Security Index", y="Predicted Value of Personal Security Index",
               caption='Source: NEC Safe Cities Index 2017')
 
