@@ -39,12 +39,28 @@ some=c("Manila","Lima", "Washington DC","Tokyo")
 subSafe1=safe3x[safe3x$city %in% some,]
 
 base = ggRadar(subSafe1,aes(group='city'),
-               alpha = 0,legend.position="top") 
+               alpha = 0,legend.position="bottom") 
 
-base +  theme(legend.title=element_blank())
+base1 = base + labs(title='Safety Index Scores by City',
+                    subtitle='Tokyo scores highest in all categories',
+                    caption='Source: NEC Safe Cities Index 2017')
+
+base2 =  base1 + theme(legend.title=element_blank(),
+               plot.title=element_text(size=17,
+                                       face='bold',
+                                       hjust=0.5),
+               plot.subtitle=element_text(hjust=0.5),
+               plot.margin=unit(c(.25,0,0,0),"cm"),
+               axis.ticks=element_blank(),
+               axis.text.y=element_blank(),
+               axis.text.x=element_text(size=7),
+               panel.background=element_rect(fill='white'),
+               panel.grid=element_line(color='gray90'))
+
+base2
 ```
 
-#Improving an inferential plot
+### Improving an inferential plot
 ```{r, message=FALSE, warning=FALSE}
 safe4=read.xlsx(link3)
 
@@ -74,8 +90,6 @@ marginalSummary=summary(margins_logit_PERSONAL)
 
 as.data.frame(marginalSummary)
 
-
-
 digi=cplot(logit_PERSONAL, "DIGITAL",draw = F)
 ```
 
@@ -84,13 +98,28 @@ digi=cplot(logit_PERSONAL, "DIGITAL",draw = F)
 base = ggplot(digi, aes(x = xvals)) 
 
 p1= base + geom_ribbon(aes(ymin = lower, ymax = upper), 
-                       fill = "grey90")
+                       fill = "grey90",
+                       show.legend=TRUE)
 
 p2 = p1 + geom_line(aes(y = yvals)) 
 
-p3= p2 + labs(title="Effect of DIGITAL index on PERSONAL index",
-              x= "DIGITAL", y="Predicted Value")
-p3 + theme_bw()
+p3= p2 + labs(title='Marginal Effects of Digital Security Index on Personal Security Index',
+              subtitle="Digital security index values below 50 do not have large effect on personal security index",
+              x= "Digital Security Index", y="Predicted Value of Personal Security Index",
+              caption='Source: NEC Safe Cities Index 2017')
+
+p4 = p3 + theme(plot.title=element_text(size=15,
+                                   hjust=0.5),
+           plot.subtitle=element_text(size=10,
+                                      hjust=0.5),
+           panel.background=element_rect(fill='white'),
+           panel.grid=element_line(color='gray90'),
+           axis.line=element_line(color='black'))
+
+p5 = p4 + geom_vline(xintercept = 50, lty = 2)
+
+p5 + annotate("text", x = 78, y = 0.6,
+                   label = "Gray area indicates \n95% confidence interval", size = 3.5)
 
 ```
 
