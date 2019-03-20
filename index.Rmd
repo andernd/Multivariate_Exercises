@@ -1,0 +1,43 @@
+## Nathan Anderson-Hobbs
+### PUBPOL 599 B Visual Analytics
+### Multivariate Exercises
+#### March 20, 2019
+
+```{r warning=FALSE}
+#loading libraries
+library(openxlsx)
+library(ggplot2)
+library(ggiraphExtra)
+
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+
+link3="https://github.com/EvansDataScience/data/raw/master/safeCitiesIndex.xlsx"
+
+safe3x=read.xlsx(link3)
+
+safe3x$min=apply(safe3x[,c(2:5)],1,min)
+
+safe3x$min=rank(safe3x$min,ties.method ='first' )
+
+cityRk=as.factor(safe3x[order(safe3x$min),]$city)
+
+safe3x$city=factor(safe3x$city,
+                   levels= cityRk,
+                   labels = cityRk,
+                   ordered = T)
+
+safe3x$min=NULL
+
+some=c("Manila","Lima", "Washington DC","Tokyo")
+
+subSafe1=safe3x[safe3x$city %in% some,]
+
+base = ggRadar(subSafe1,aes(group='city'),
+               alpha = 0,legend.position="top") 
+
+base +  theme(legend.title=element_blank())
+```
+
