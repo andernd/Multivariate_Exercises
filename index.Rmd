@@ -3,15 +3,18 @@
 ### Multivariate Exercises
 #### March 20, 2019
 
-```{r warning=FALSE}
+```{r warning=FALSE, message=FALSE}
 #loading libraries
 library(openxlsx)
 library(ggplot2)
 library(ggiraphExtra)
-
+library(dotwhisker)
+library(broom)
+library(dplyr)
+library(margins)
 ```
 
-
+### Improving a descriptive plot
 ```{r, message=FALSE, warning=FALSE}
 
 link3="https://github.com/EvansDataScience/data/raw/master/safeCitiesIndex.xlsx"
@@ -39,5 +42,55 @@ base = ggRadar(subSafe1,aes(group='city'),
                alpha = 0,legend.position="top") 
 
 base +  theme(legend.title=element_blank())
+```
+
+#Improving an inferential plot
+```{r, message=FALSE, warning=FALSE}
+safe4=read.xlsx(link3)
+
+model1=lm(PERSONAL~HEALTH+INFRASTRUCTURE,data=safe4[,-1])
+
+model1_t = tidy(model1) %>% 
+    mutate(model = "Model 1")
+
+model2=lm(PERSONAL~.,data=safe4[,-1])
+
+model2_t <- tidy(model2) %>% mutate(model = "Model 2")
+
+allModels=rbind(model1_t, model2_t)
+
+cut=median(safe4$PERSONAL)
+safe4$PERSONAL_bi=ifelse(safe4$PERSONAL>cut,
+                         1,0)
+
+logit_PERSONAL = glm(PERSONAL_bi~ .,
+                          data = safe4[,-c(1,5)],
+                          family = "binomial")
+
+
+margins_logit_PERSONAL = margins(logit_PERSONAL) 
+
+marginalSummary=summary(margins_logit_PERSONAL)
+
+as.data.frame(marginalSummary)
+
+
+
+digi=cplot(logit_PERSONAL, "DIGITAL",draw = F)
+```
+
+
+```{r}
+base = ggplot(digi, aes(x = xvals)) 
+
+p1= base + geom_ribbon(aes(ymin = lower, ymax = upper), 
+                       fill = "grey90")
+
+p2 = p1 + geom_line(aes(y = yvals)) 
+
+p3= p2 + labs(title="Effect of DIGITAL index on PERSONAL index",
+              x= "DIGITAL", y="Predicted Value")
+p3 + theme_bw()
+
 ```
 
